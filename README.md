@@ -21,7 +21,7 @@ Morphe Manager then updates the patches automatically whenever a new release is 
 
 <!-- PATCHES_START -->
 <details open>
-<summary>📦 Samsung Voice Recorder&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 Samsung Voice Recorder&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -31,11 +31,36 @@ Morphe Manager then updates the patches automatically whenever a new release is 
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Batch transcribe](#batch-transcribe) | Shows Transcribe when several recordings are selected and transcribes them one after another, in list order. Recordings that can't be transcribed are skipped, and recordings can be added while others are still transcribing. Queued recordings show as waiting, a failed recording does not interrupt the batch, a notification shows the batch's progress and can cancel it, and a summary is shown when the batch ends. |  |
 | [Import any audio files](#import-any-audio-files) | Imports audio files of any format in the Recordings folder and .oga files anywhere, including files not recorded by this app, and shows them in All recordings. .m4a files there are treated as recorded by this app even without its metadata, and transcription and AI features work on all formats except .amr and .3ga. Adds a setting for additional folders to import, each shown in the recordings list menu. |  |
 
 </details>
 
 <!-- PATCHES_END -->
+
+## Batch transcribe
+
+- **Several recordings:** Transcribe stays in the bottom bar when more than one recording is
+  selected, as long as at least one of them can be transcribed. Recordings that can't
+  (already transcribed, longer than 3 hours, unsupported format, ...) are skipped with a
+  toast saying how many.
+- **Order:** recordings are transcribed one at a time, top to bottom as the list is sorted.
+- **Adding to the queue:** Transcribe also works while other recordings are transcribing.
+  The new ones join the end of the queue.
+- **Language:** follows the app's setting. With language auto-detection on, each recording
+  detects its own language. Otherwise the language dialog is shown once and its choice is
+  used for every recording.
+- **Waiting recordings** read "Waiting to transcribe" in the list and can be cancelled
+  one by one.
+- **Failures:** a recording that fails, for example because no matching language pack is
+  installed, is skipped without opening the language dialog or the language pack download.
+  The queue moves on.
+- **Batch notification:** a separate notification shows *Transcribing recordings (N/M)*,
+  where N is the number of finished recordings and M the size of the batch, with the
+  current recording's name and a progress bar for the whole batch. **Cancel all** cancels
+  the whole queue, and so does **Cancel** in the app's own notification. When the batch
+  ends, it turns into a dismissible summary of how many recordings were transcribed and
+  how many failed, also shown as a toast.
 
 ## Import any audio files
 
@@ -97,6 +122,9 @@ Morphe Manager then updates the patches automatically whenever a new release is 
   files go to the system trash and can be restored from My Files.
 - **21.5.85.69:** this version has no decoder fallback, so Ogg Opus files play but cannot
   be transcribed there.
+- **Batch transcribe in short landscape windows:** where the selection actions move to the
+  top bar (phones in landscape), Transcribe stays limited to a single recording.
+- **Batch transcribe on 21.5.85.69:** batches run in selection order instead of list order.
 - **Labels:** labels added by the patches are English only.
 
 ## 🛠️ Building
