@@ -7,6 +7,16 @@ Samsung Voice Recorder only lists, plays and transcribes recordings it made itse
 a few `.m4a`/`.amr`/`.3ga` files from elsewhere. These patches make it a player and
 transcriber for audio recorded by other apps, such as call recorders.
 
+## 📥 Adding to Morphe Manager
+
+In Morphe Manager, add a patch source with this URL:
+
+```
+https://raw.githubusercontent.com/arter97/voicenote-morphe/refs/heads/bundle/patches-bundle.json
+```
+
+Morphe Manager then updates the patches automatically whenever a new release is published.
+
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->

@@ -53,6 +53,18 @@ jobs:
           } > CHANGELOG.md
           cat CHANGELOG.md
 
+      - name: Generate patches-bundle.json
+        run: |
+          # Polled by Morphe Manager; it reinstalls whenever "version" changes
+          jq -n \
+            --arg version "$REV" \
+            --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%S)" \
+            --rawfile description CHANGELOG.md \
+            --arg download_url "https://github.com/${{ github.repository }}/releases/download/$REV/$(basename "$MPP")" \
+            '{created_at: $created_at, description: $description, download_url: $download_url, signature_download_url: "", version: $version}' \
+            > patches-bundle.json
+          cat patches-bundle.json
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
@@ -62,3 +74,16 @@ jobs:
           body_path: CHANGELOG.md
           files: ${{ env.MPP }}
           fail_on_unmatched_files: true
+
+      # Kept off master so bot commits don't shift the rN commit count
+      - name: Publish patches-bundle.json to bundle branch
+        run: |
+          dir=$(mktemp -d)
+          cp patches-bundle.json "$dir/"
+          cd "$dir"
+          git init -q -b bundle
+          git add patches-bundle.json
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898299+github-actions[bot]@users.noreply.github.com' \
+              commit -q -m "Bundle $REV"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" bundle

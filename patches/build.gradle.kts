@@ -8,7 +8,7 @@ patches {
     about {
         name = "Voice Recorder Patches"
         description = "Patches for Samsung Voice Recorder"
-        source = "git@github.com:arter97/voicenote-morphe.git"
+        source = "https://github.com/arter97/voicenote-morphe"
         author = "arter97"
         contact = "https://github.com/arter97/voicenote-morphe/issues"
         website = "https://github.com/arter97/voicenote-morphe"
