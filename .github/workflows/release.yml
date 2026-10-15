@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  # Morphe Gradle plugin is resolved from GitHub Packages
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history and tags for the revision number and changelog
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Build patches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew --no-daemon :patches:buildAndroid
+
+      - name: Locate patches
+        run: |
+          rev="r$(git rev-list --count HEAD)"
+          echo "REV=$rev" >> "$GITHUB_ENV"
+          echo "MPP=patches/build/libs/voicenote-morphe-${rev}-$(git rev-parse --short HEAD).mpp" >> "$GITHUB_ENV"
+
+      - name: Generate changelog
+        run: |
+          # Commits since the previous rN release, or the whole history for the first one
+          prev=$(git describe --tags --abbrev=0 --match 'r[0-9]*' HEAD^ 2>/dev/null || true)
+          {
+            echo "## Changes"
+            echo
+            git log --no-merges --format='- %s (%h)' ${prev:+$prev..}HEAD
+          } > CHANGELOG.md
+          cat CHANGELOG.md
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ env.REV }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.REV }}
+          body_path: CHANGELOG.md
+          files: ${{ env.MPP }}
+          fail_on_unmatched_files: true
